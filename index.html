@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BTC Kế Hoạch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+:root{--bg:#F5F5F5;--panel:#FFFFFF;--panel2:#F7F8FA;--bd:#EAECEF;--fg:#1E2329;--mut:#707A8A;--up:#03A66D;--down:#CF304A;--acc:#C99400;--yel:#FCD535;--upbg:#E6F6F0;--downbg:#FBEAEC;--accbg:#FEF6D8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 'IBM Plex Sans',system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.up{color:var(--up)}.down{color:var(--down)}.mut{color:var(--mut)}.acc{color:var(--acc)}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 30px;padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--bd)}
+.sym{font-size:20px;font-weight:700;line-height:1.2}.sym small{display:block;color:var(--mut);font-size:12px;font-weight:500}
+.px{font-size:28px;font-weight:700}
+.stat span{display:block;color:var(--mut);font-size:12px}.stat b{font-weight:500}
+.status{padding:6px 20px;color:var(--mut);font-size:12px}
+.wrapper{max-width:1240px;margin:0 auto;padding:0 12px 24px}
+.panel{background:var(--panel);border:1px solid var(--bd);border-radius:10px;padding:18px 20px;margin-top:12px}
+h2{font-size:19px;margin:0 0 10px;font-weight:700}
+h3{font-size:18px;margin:0;font-weight:700}
+h4{font-size:14px;margin:18px 0 8px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.b{display:inline-block;padding:2px 10px;border-radius:4px;font-size:13px;font-weight:700;white-space:nowrap}
+.b.up{background:var(--upbg)}.b.down{background:var(--downbg)}.b.neu{background:var(--panel2);color:var(--mut)}.b.acc{background:var(--accbg);color:var(--acc)}
+.hero{border-left:5px solid var(--yel)}
+.hero .big{font-size:22px;font-weight:700;margin:4px 0 6px}
+.hero p{margin:4px 0}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.cards{grid-template-columns:1fr}}
+.cards .panel{margin-top:12px}
+.tfh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.why{margin:8px 0 0;color:var(--fg)}
+.rsi{margin-top:12px}
+.rsibar{position:relative;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--upbg) 0 30%,#EEF0F3 30% 70%,var(--downbg) 70%);margin:6px 0 2px}
+.rsibar i{position:absolute;top:-5px;width:4px;height:22px;background:var(--fg);border-radius:2px;transform:translateX(-2px)}
+.rsiscale{display:flex;justify-content:space-between;font-size:11px;color:var(--mut)}
+.ladder{border:1px solid var(--bd);border-radius:8px;overflow:hidden}
+.lv{display:grid;grid-template-columns:150px 1fr auto;gap:10px;padding:8px 12px;border-top:1px solid var(--bd);align-items:center;font-size:14px}
+.lv:first-child{border-top:0}
+.lv b{font-size:15px}
+.lv.res{background:#FFF8F9}.lv.sup{background:#F5FCF9}
+.lv.now{background:var(--accbg);font-weight:700}
+.sc{border:1px solid var(--bd);border-left:5px solid var(--bd);border-radius:8px;padding:12px 14px;margin-top:10px}
+.sc.long{border-left-color:var(--up)}.sc.short{border-left-color:var(--down)}
+.sc p{margin:6px 0}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 4px}
+@media(max-width:520px){.g4{grid-template-columns:1fr 1fr}.lv{grid-template-columns:110px 1fr}}
+.g4 div{background:var(--panel2);border-radius:6px;padding:6px 10px}
+.g4 span{display:block;font-size:12px;color:var(--mut)}.g4 b{font-size:16px}
+.prob{font-size:14px;color:var(--mut)}
+.warn{background:var(--accbg);border-radius:8px;padding:8px 12px;margin-top:10px;font-size:14px}
+.bar{display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin:4px 0}
+.bar .lab{color:var(--mut);font-size:13px;margin-right:6px}
+button.c{background:transparent;border:0;color:var(--mut);padding:5px 12px;border-radius:6px;font:inherit;font-weight:600;cursor:pointer}
+button.c:hover{color:var(--fg)}button.c.on{color:var(--fg);background:var(--yel)}
+#cMain{height:440px}#cOsc{height:160px}
+.hint{color:var(--mut);font-size:13px;margin-left:auto}
+details.panel>summary{cursor:pointer;font-size:17px;font-weight:700}
+details[open]>summary{margin-bottom:10px}
+table{width:100%;border-collapse:collapse}
+th{color:var(--mut);font-size:12px;font-weight:500;text-align:right;padding:6px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:8px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap;font-size:14px}
+th:first-child,td:first-child{text-align:left}
+td.nm{white-space:normal;font-weight:500;min-width:220px}
+tr.rule{cursor:pointer}tr.rule:hover td,tr.sel td{background:var(--accbg)}
+tr.grp td{color:var(--acc);font-size:12px;font-weight:700;text-transform:uppercase;padding-top:16px}
+.wrap{overflow-x:auto}
+.two{display:grid;grid-template-columns:1fr 1.6fr;gap:20px}@media(max-width:900px){.two{grid-template-columns:1fr}}
+.note{color:var(--mut);font-size:14px}.note b{color:var(--fg)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="sym">BTC/USDT<small>Binance · Spot</small></div>
+  <div class="px" id="px">–</div>
+  <div class="stat"><span>Thay đổi 24h</span><b id="chg">–</b></div>
+  <div class="stat"><span>Cao 24h</span><b id="hi24">–</b></div>
+  <div class="stat"><span>Thấp 24h</span><b id="lo24">–</b></div>
+  <div class="stat"><span>KL 24h (USDT)</span><b id="vol24">–</b></div>
+</header>
+<div class="status" id="status">Đang tải dữ liệu khung D và 4H…</div>
+
+<div class="wrapper">
+  <section class="panel hero" id="hero"><h2>Nhận định nhanh</h2><p class="mut">Đang tính…</p></section>
+
+  <div class="cards">
+    <section class="panel" id="card1d"></section>
+    <section class="panel" id="card4h"></section>
+  </div>
+
+  <section class="panel">
+    <div class="bar"><span class="lab">Biểu đồ</span>
+      <button class="c" data-tf="1d">Khung D</button><button class="c" data-tf="4h">Khung 4H</button><button class="c" data-tf="1h">Khung 1H</button>
+      <span class="hint">Đường nét đứt <span class="down">đỏ</span> = kháng cự (vùng canh SHORT) · <span class="up">xanh</span> = hỗ trợ (vùng canh LONG)</span></div>
+    <div class="bar"><span class="lab">Hiện thêm</span>
+      <button class="c" data-ov="ema">EMA 50/200</button><button class="c" data-ov="st">Supertrend</button>
+      <button class="c" data-ov="bb">Bollinger</button><button class="c" data-ov="ichi">Mây Ichimoku</button><button class="c" data-ov="lv">Mức giá quan trọng</button>
+      <span class="hint" id="markInfo"></span></div>
+    <div id="cMain"></div>
+    <div class="bar"><span class="lab">Chỉ báo</span>
+      <button class="c" data-osc="RSI">RSI</button><button class="c" data-osc="Stoch RSI">Stoch RSI</button>
+      <button class="c" data-osc="MACD">MACD</button><button class="c" data-osc="ADX">ADX/DMI</button><button class="c" data-osc="MFI">MFI</button></div>
+    <div id="cOsc"></div>
+  </section>
+
+  <details class="panel">
+    <summary>Xem thống kê chi tiết (dành cho người muốn tìm hiểu sâu) — theo khung đang chọn ở biểu đồ</summary>
+    <div class="bar"><span class="lab">Tỉ lệ lời:lỗ (R:R) khi giả lập</span>
+      <button class="c" data-rr="1">1:1</button><button class="c" data-rr="1.5">1:1.5</button><button class="c" data-rr="2">1:2</button><button class="c" data-rr="3">1:3</button></div>
+    <div class="two">
+      <div><h4>Tổng hợp 11 chỉ báo</h4><div id="gauge"></div><table id="tech"></table></div>
+      <div><h4>Tín hiệu trong 20 nến gần nhất</h4><div class="wrap"><table id="recent"></table></div></div>
+    </div>
+    <h4>Thống kê toàn bộ tín hiệu (2017 → nay) · bấm 1 dòng để xem trên biểu đồ</h4>
+    <div class="bar"><span class="lab">Sắp xếp</span><button class="c" data-sort="R">Hiệu quả nhất</button><button class="c" data-sort="group">Theo nhóm</button></div>
+    <div class="wrap"><table id="stats"></table></div>
+    <p class="note"><b>Chạm TP</b> = % lệnh chạm chốt lời trước cắt lỗ (cắt lỗ = 1.5×ATR, đã trừ phí). <b>Kỳ vọng R</b> = lãi/lỗ trung bình mỗi lệnh: +0.20R nghĩa là mỗi lệnh rủi ro 100$ thì trung bình lãi 20$.
+      <b>Đạt chuẩn ✓</b> = ≥ 30 lệnh và có lãi cả toàn bộ lẫn 2 năm gần nhất.</p>
+  </details>
+
+  <p class="note" style="padding:0 6px">⚠️ Mọi con số là thống kê từ dữ liệu quá khứ, không phải lời khuyên đầu tư. Luôn đặt cắt lỗ, không dùng đòn bẩy cao.</p>
+</div>
+
+<script>
+const START = 1502928000000;
+const MS = {'1h': 36e5, '4h': 144e5, '1d': 864e5};
+const HOR = {'1h': [168, '7 ngày'], '4h': [42, '7 ngày'], '1d': [14, '14 ngày']};
+const TFN = {'1h': '1H', '4h': '4H', '1d': 'D'};
+const LB = 5, W = 201, VN = 7 * 3600, FEE = 0.001, SLM = 1.5, MINN = 30, CH = 1500;
+const store = {'1h': {data: new Map()}, '4h': {data: new Map()}, '1d': {data: new Map()}};
+let chartTf = '4h', rr = 2, sortBy = 'R', osc = 'RSI', sel = null, fit = true, charts;
+const ov = {ema: true, st: false, bb: false, ichi: false, lv: true};
+const $ = id => document.getElementById(id);
+const vn = (t, o = {hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit'}) =>
+  new Date(t).toLocaleString('vi-VN', {timeZone: 'Asia/Ho_Chi_Minh', ...o});
+const num = (x, d = 0) => x.toLocaleString('en-US', {minimumFractionDigits: d, maximumFractionDigits: d});
+const sg = s => (String(s).startsWith('-') ? '' : '+') + s;
+const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+const tag = d => `<span class="b ${d > 0 ? 'up' : 'down'}">${d > 0 ? 'LONG' : 'SHORT'}</span>`;
+const rcls = R => R > 0.05 ? 'up' : R < -0.05 ? 'down' : '';
+const pct = (a, b) => ((a / b - 1) * 100).toFixed(1) + '%';
+
+// ================= Dữ liệu =================
+const api = (path, q = '') => fetch(`https://data-api.binance.vision/api/v3/${path}?symbol=BTCUSDT${q}`)
+  .then(r => { if (!r.ok) throw Error('HTTP ' + r.status); return r.json(); });
+
+async function loadTF(t, full) {
+  const kl = q => api('klines', `&interval=${t}&limit=1000${q}`);
+  let pages;
+  if (full) {
+    const starts = [];
+    for (let s = START; s < Date.now(); s += 1000 * MS[t]) starts.push(s);
+    pages = await Promise.all(starts.map(s => kl('&startTime=' + s)));
+  } else pages = [await kl()];
+  for (const k of pages.flat()) store[t].data.set(k[0], k);
+  store[t].D = compute(t);
+}
+
+async function ticker() {
+  try {
+    const t = await api('ticker/24hr'), p = +t.lastPrice, ch = +t.priceChangePercent, cls = ch >= 0 ? 'up' : 'down';
+    $('px').textContent = num(p, 2); $('px').className = 'px ' + cls;
+    $('chg').textContent = sg(ch.toFixed(2)) + '%'; $('chg').className = cls;
+    $('hi24').textContent = num(+t.highPrice, 2); $('lo24').textContent = num(+t.lowPrice, 2);
+    $('vol24').textContent = (+t.quoteVolume / 1e9).toFixed(2) + 'B';
+    document.title = `${num(p, 0)} · BTC Kế Hoạch`;
+  } catch (e) { /* chỉ để hiển thị */ }
+}
+
+// ================= Chỉ báo =================
+const ema = (s, n) => { const k = 2 / (n + 1), o = [s[0]]; for (let i = 1; i < s.length; i++) o.push(s[i] * k + o[i - 1] * (1 - k)); return o; };
+const rma = (s, n) => { const o = [s[0]]; for (let i = 1; i < s.length; i++) o.push((o[i - 1] * (n - 1) + s[i]) / n); return o; };
+const roll = (s, n, fn) => s.map((_, i) => i < n - 1 || s[i - n + 1] == null ? null : fn(s.slice(i - n + 1, i + 1)));
+const maxA = a => Math.max(...a), minA = a => Math.min(...a);
+// RSI Wilder; trả thêm trung bình tăng (G) / giảm (Ls) để tính ngược "giá bao nhiêu thì RSI = x"
+function rsi(c, n = 14) {
+  const r = Array(c.length).fill(null), G = [...r], Ls = [...r]; let g = 0, l = 0;
+  for (let i = 1; i <= n; i++) { const d = c[i] - c[i - 1]; g += Math.max(d, 0); l += Math.max(-d, 0); }
+  g /= n; l /= n;
+  for (let i = n; i < c.length; i++) {
+    if (i > n) { const d = c[i] - c[i - 1]; g = (g * (n - 1) + Math.max(d, 0)) / n; l = (l * (n - 1) + Math.max(-d, 0)) / n; }
+    r[i] = l ? 100 - 100 / (1 + g / l) : 100; G[i] = g; Ls[i] = l;
+  }
+  return {r, G, Ls};
+}
+
+function compute(t) {
+  const rows = [...store[t].data.values()].sort((a, b) => a[0] - b[0]);
+  const T = rows.map(k => k[0]), O = rows.map(k => +k[1]), H = rows.map(k => +k[2]), L = rows.map(k => +k[3]),
+        C = rows.map(k => +k[4]), V = rows.map(k => +k[5]);
+  const N = C.length - 1; // nến cuối đang chạy
+
+  const TR = C.map((c, i) => i ? Math.max(H[i] - L[i], Math.abs(H[i] - C[i - 1]), Math.abs(L[i] - C[i - 1])) : H[i] - L[i]);
+  const A = rma(TR, 14);
+  const {r: R, G, Ls} = rsi(C);
+  const E50 = ema(C, 50), E200 = ema(C, 200), E12 = ema(C, 12), E26 = ema(C, 26);
+  const M = E12.map((v, i) => v - E26[i]), S = ema(M, 9), HI = M.map((v, i) => v - S[i]);
+  const BM = roll(C, 20, mean), SD = roll(C, 20, a => { const m = mean(a); return Math.sqrt(mean(a.map(x => (x - m) ** 2))); });
+  const BU = BM.map((m, i) => m == null ? null : m + 2 * SD[i]), BL = BM.map((m, i) => m == null ? null : m - 2 * SD[i]);
+  const VM = roll(V, 20, mean);
+  const rHi = roll(R, 14, maxA), rLo = roll(R, 14, minA);
+  const raw = R.map((r, i) => rHi[i] == null ? null : rHi[i] === rLo[i] ? 50 : 100 * (r - rLo[i]) / (rHi[i] - rLo[i]));
+  const K = roll(raw, 3, mean), DK = roll(K, 3, mean);
+  const A10 = rma(TR, 10), ST = [], DIR = [];
+  let fu = 0, fl = 0, dir = 1;
+  for (let i = 0; i < C.length; i++) {
+    const hl = (H[i] + L[i]) / 2, bu = hl + 3 * A10[i], bl = hl - 3 * A10[i];
+    if (i === 0) { fu = bu; fl = bl; }
+    else {
+      const pu = fu, pl = fl;
+      fu = bu < pu || C[i - 1] > pu ? bu : pu;
+      fl = bl > pl || C[i - 1] < pl ? bl : pl;
+      if (dir === -1 && C[i] > pu) dir = 1; else if (dir === 1 && C[i] < pl) dir = -1;
+    }
+    DIR.push(dir); ST.push(dir === 1 ? fl : fu);
+  }
+  const pDM = H.map((h, i) => { if (!i) return 0; const u = h - H[i - 1], d = L[i - 1] - L[i]; return u > d && u > 0 ? u : 0; });
+  const mDM = L.map((l, i) => { if (!i) return 0; const u = H[i] - H[i - 1], d = L[i - 1] - l; return d > u && d > 0 ? d : 0; });
+  const PDI = rma(pDM, 14).map((v, i) => 100 * v / A[i]), MDI = rma(mDM, 14).map((v, i) => 100 * v / A[i]);
+  const ADX = rma(PDI.map((p, i) => p + MDI[i] ? 100 * Math.abs(p - MDI[i]) / (p + MDI[i]) : 0), 14);
+  const hh = n => roll(H, n, maxA), ll = n => roll(L, n, minA);
+  const H9 = hh(9), L9 = ll(9), H26 = hh(26), L26 = ll(26), H52 = hh(52), L52 = ll(52);
+  const TEN = H9.map((h, i) => h == null ? null : (h + L9[i]) / 2), KIJ = H26.map((h, i) => h == null ? null : (h + L26[i]) / 2);
+  const SA0 = TEN.map((x, i) => x == null || KIJ[i] == null ? null : (x + KIJ[i]) / 2), SB0 = H52.map((h, i) => h == null ? null : (h + L52[i]) / 2);
+  const SA = C.map((_, i) => i >= 26 ? SA0[i - 26] : null), SB = C.map((_, i) => i >= 26 ? SB0[i - 26] : null);
+  const TOP = SA.map((a, i) => a == null || SB[i] == null ? null : Math.max(a, SB[i])), BOT = SA.map((a, i) => a == null || SB[i] == null ? null : Math.min(a, SB[i]));
+  const HH20 = hh(20), LL20 = ll(20), HH55 = hh(55), LL55 = ll(55);
+  const TP = H.map((h, i) => (h + L[i] + C[i]) / 3), MFI = Array(C.length).fill(null);
+  for (let i = 15; i < C.length; i++) {
+    let p = 0, n = 0;
+    for (let j = i - 13; j <= i; j++) { const f = TP[j] * V[j]; if (TP[j] > TP[j - 1]) p += f; else if (TP[j] < TP[j - 1]) n += f; }
+    MFI[i] = n ? 100 - 100 / (1 + p / n) : 100;
+  }
+
+  const val = (b, j) => typeof b === 'number' ? b : b[j];
+  const over = (a, b, i) => a[i - 1] <= val(b, i - 1) && a[i] > val(b, i);
+  const under = (a, b, i) => a[i - 1] >= val(b, i - 1) && a[i] < val(b, i);
+  const up = i => C[i] > E200[i], dn = i => C[i] < E200[i];
+  const stUp = i => DIR[i] === 1 && DIR[i - 1] === -1, stDn = i => DIR[i] === -1 && DIR[i - 1] === 1;
+  const brkUp = (X, i) => C[i] > X[i - 1] && C[i - 1] <= X[i - 2], brkDn = (X, i) => C[i] < X[i - 1] && C[i - 1] >= X[i - 2];
+
+  const rules = [
+    ['RSI', 'RSI cắt xuống dưới 30', 1, i => under(R, 30, i)],
+    ['RSI', 'RSI quay lên lại trên 30', 1, i => over(R, 30, i)],
+    ['RSI', 'RSI cắt lên trên 70', -1, i => over(R, 70, i)],
+    ['RSI', 'RSI quay xuống lại dưới 70', -1, i => under(R, 70, i)],
+    ['RSI', 'Phân kỳ tăng, RSI gần 30', 1, null],
+    ['RSI', 'Phân kỳ giảm, RSI gần 70', -1, null],
+    ['Stoch RSI', 'Stoch RSI cắt lên, vùng dưới 20', 1, i => over(K, DK, i) && K[i] < 20],
+    ['Stoch RSI', 'Stoch RSI cắt xuống, vùng trên 80', -1, i => under(K, DK, i) && K[i] > 80],
+    ['MFI', 'MFI quay lên trên 20', 1, i => over(MFI, 20, i)],
+    ['MFI', 'MFI quay xuống dưới 80', -1, i => under(MFI, 80, i)],
+    ['EMA', 'EMA50 cắt lên EMA200 (Golden cross)', 1, i => over(E50, E200, i)],
+    ['EMA', 'EMA50 cắt xuống EMA200 (Death cross)', -1, i => under(E50, E200, i)],
+    ['EMA', 'Giá cắt lên EMA200', 1, i => over(C, E200, i)],
+    ['EMA', 'Giá cắt xuống EMA200', -1, i => under(C, E200, i)],
+    ['MACD', 'MACD cắt lên Signal', 1, i => over(M, S, i)],
+    ['MACD', 'MACD cắt xuống Signal', -1, i => under(M, S, i)],
+    ['MACD', 'MACD cắt lên Signal, dưới mức 0', 1, i => over(M, S, i) && M[i] < 0],
+    ['MACD', 'MACD cắt xuống Signal, trên mức 0', -1, i => under(M, S, i) && M[i] > 0],
+    ['Supertrend', 'Supertrend chuyển xanh (tăng)', 1, stUp],
+    ['Supertrend', 'Supertrend chuyển đỏ (giảm)', -1, stDn],
+    ['ADX / DMI', '+DI cắt lên −DI, ADX > 25', 1, i => over(PDI, MDI, i) && ADX[i] > 25],
+    ['ADX / DMI', '−DI cắt lên +DI, ADX > 25', -1, i => over(MDI, PDI, i) && ADX[i] > 25],
+    ['Ichimoku', 'Giá vượt lên trên mây', 1, i => C[i] > TOP[i] && C[i - 1] <= TOP[i - 1]],
+    ['Ichimoku', 'Giá thủng xuống dưới mây', -1, i => C[i] < BOT[i] && C[i - 1] >= BOT[i - 1]],
+    ['Ichimoku', 'Tenkan cắt lên Kijun, giá trên mây', 1, i => over(TEN, KIJ, i) && C[i] > TOP[i]],
+    ['Ichimoku', 'Tenkan cắt xuống Kijun, giá dưới mây', -1, i => under(TEN, KIJ, i) && C[i] < BOT[i]],
+    ['Bollinger', 'Giá đóng dưới band dưới (bắt đáy)', 1, i => under(C, BL, i)],
+    ['Bollinger', 'Giá đóng trên band trên (bắt đỉnh)', -1, i => over(C, BU, i)],
+    ['Bollinger', 'Phá band trên + volume lớn', 1, i => over(C, BU, i) && V[i] > 2 * VM[i]],
+    ['Bollinger', 'Phá band dưới + volume lớn', -1, i => under(C, BL, i) && V[i] > 2 * VM[i]],
+    ['Donchian / Turtle', 'Phá đỉnh 20 nến', 1, i => brkUp(HH20, i)],
+    ['Donchian / Turtle', 'Thủng đáy 20 nến', -1, i => brkDn(LL20, i)],
+    ['Donchian / Turtle', 'Phá đỉnh 55 nến (Turtle)', 1, i => brkUp(HH55, i)],
+    ['Donchian / Turtle', 'Thủng đáy 55 nến (Turtle)', -1, i => brkDn(LL55, i)],
+    ['Kết hợp', 'Uptrend + RSI xuống dưới 35 (mua khi điều chỉnh)', 1, i => up(i) && under(R, 35, i)],
+    ['Kết hợp', 'Downtrend + RSI lên trên 65 (bán khi hồi)', -1, i => dn(i) && over(R, 65, i)],
+    ['Kết hợp', 'Uptrend + Stoch RSI cắt lên dưới 20', 1, i => up(i) && over(K, DK, i) && K[i] < 20],
+    ['Kết hợp', 'Downtrend + Stoch RSI cắt xuống trên 80', -1, i => dn(i) && under(K, DK, i) && K[i] > 80],
+    ['Kết hợp', 'Uptrend + MACD cắt lên', 1, i => up(i) && over(M, S, i)],
+    ['Kết hợp', 'Downtrend + MACD cắt xuống', -1, i => dn(i) && under(M, S, i)],
+    ['Kết hợp', 'Uptrend + chạm band dưới', 1, i => up(i) && L[i] <= BL[i] && L[i - 1] > BL[i - 1]],
+    ['Kết hợp', 'Downtrend + chạm band trên', -1, i => dn(i) && H[i] >= BU[i] && H[i - 1] < BU[i - 1]],
+    ['Kết hợp', 'Supertrend xanh + ADX > 25', 1, i => stUp(i) && ADX[i] > 25],
+    ['Kết hợp', 'Supertrend đỏ + ADX > 25', -1, i => stDn(i) && ADX[i] > 25],
+    ['Kết hợp', 'Phá đỉnh 20 nến + volume > 1.5× TB', 1, i => brkUp(HH20, i) && V[i] > 1.5 * VM[i]],
+    ['Kết hợp', 'Thủng đáy 20 nến + volume > 1.5× TB', -1, i => brkDn(LL20, i) && V[i] > 1.5 * VM[i]],
+    ['Kết hợp', 'Đồng thuận: trên mây + trên EMA200 + MACD cắt lên', 1, i => C[i] > TOP[i] && up(i) && over(M, S, i)],
+    ['Kết hợp', 'Đồng thuận: dưới mây + dưới EMA200 + MACD cắt xuống', -1, i => C[i] < BOT[i] && dn(i) && under(M, S, i)],
+  ].map(([g, name, d, f]) => ({g, name, d, f, idx: []}));
+
+  for (let i = W; i < N; i++) for (const r of rules) if (r.f && r.f(i)) r.idx.push(i);
+  const piv = (i, lo) => { const w = R.slice(i - LB, i + LB + 1); return R[i] === (lo ? minA(w) : maxA(w)); };
+  const plo = [], phi = [];
+  for (let i = W; i < N - LB; i++) { if (piv(i, true)) plo.push(i); if (piv(i, false)) phi.push(i); }
+  for (let k = 1; k < plo.length; k++) { const a = plo[k - 1], b = plo[k];
+    if (b - a >= 5 && b - a <= 60 && R[b] > R[a] && L[b] < L[a] && R[b] <= 35) rules[4].idx.push(b + LB); }
+  for (let k = 1; k < phi.length; k++) { const a = phi[k - 1], b = phi[k];
+    if (b - a >= 5 && b - a <= 60 && R[b] < R[a] && H[b] > H[a] && R[b] >= 65) rules[5].idx.push(b + LB); }
+
+  const [h] = HOR[t], split = N - Math.round(730 * 864e5 / MS[t]);
+  function sim(idx, d) {
+    let n = 0, w = 0, sum = 0;
+    for (const e of idx) {
+      const risk = SLM * A[e], sl = C[e] - d * risk, tp = C[e] + d * rr * risk;
+      let res = null;
+      for (let j = e + 1; j <= Math.min(e + h, N - 1); j++) {
+        if (d > 0 ? L[j] <= sl : H[j] >= sl) { res = -1; break; } // cùng nến chạm cả hai → tính thua
+        if (d > 0 ? H[j] >= tp : L[j] <= tp) { res = rr; w++; break; }
+      }
+      if (res === null) { if (e + h > N - 1) continue; res = d * (C[e + h] - C[e]) / risk; }
+      n++; sum += res - FEE * C[e] / risk;
+    }
+    return n ? {win: w / n * 100, R: sum / n, n} : null;
+  }
+  function stats(idx, d) {
+    const fw = idx.filter(e => e + h < N).map(e => d * (C[e + h] / C[e] - 1));
+    const st = {n: idx.length, dir: fw.length ? fw.filter(x => x > 0).length / fw.length * 100 : null,
+      tp: sim(idx, d), rec: sim(idx.filter(e => e >= split), d)};
+    st.ok = !!(st.tp && st.n >= MINN && st.tp.R > 0 && st.rec && st.rec.n >= 5 && st.rec.R > 0);
+    return st;
+  }
+  for (const r of rules) r.st = stats(r.idx, r.d);
+  const allIdx = Array.from({length: N - W}, (_, j) => j + W);
+  const base = {1: stats(allIdx, 1), '-1': stats(allIdx, -1)};
+
+  return {t, T, O, H, L, C, V, N, A, R, G, Ls, E50, E200, M, S, HI, BU, BL, VM, K, DK, ST, DIR, PDI, MDI, ADX, SA, SB, TOP, BOT,
+    HH20, LL20, HH55, LL55, MFI, plo, phi, rules, base};
+}
+
+// ================= Phân tích dễ hiểu =================
+// RSI nếu nến hiện tại đóng ở giá p (tính từ trạng thái nến đã đóng gần nhất)
+const rsiAt = (D, p) => { const i = D.N - 1, x = p - D.C[i], g = (13 * D.G[i] + Math.max(x, 0)) / 14, l = (13 * D.Ls[i] + Math.max(-x, 0)) / 14; return l ? 100 - 100 / (1 + g / l) : 100; };
+// Giá cần đóng để RSI = lv
+const rsiPx = (D, lv) => { const i = D.N - 1, k = lv / (100 - lv), g = D.G[i], l = D.Ls[i];
+  return D.R[i] > lv ? D.C[i] - 13 * (g / k - l) : D.C[i] + 13 * (k * l - g); };
+const ruleOf = (D, name) => D.rules.find(r => r.name === name);
+
+function trendOf(D) {
+  const {C, E50, E200, DIR, M, S, N} = D, i = N - 1;
+  const sc = [C[i] > E200[i], E50[i] > E200[i], DIR[i] === 1, M[i] > S[i]].filter(Boolean).length;
+  const [label, cls] = [['GIẢM MẠNH', 'down'], ['GIẢM', 'down'], ['ĐI NGANG', 'neu'], ['TĂNG', 'up'], ['TĂNG MẠNH', 'up']][sc];
+  return {up: C[i] > E200[i], sc, label, cls};
+}
+
+function levels(D) {
+  const {C, N, A, E50, E200, ST, DIR, BU, BL, HH20, LL20, HH55, LL55, TOP, BOT} = D, i = N - 1, p = C[N], a = A[i];
+  const up = C[i] > E200[i];
+  const raw = [
+    [E50[i], 'EMA50'], [E200[i], 'EMA200'], [ST[i], 'Supertrend'],
+    [BU[i], 'Bollinger trên'], [BL[i], 'Bollinger dưới'],
+    [HH20[i], 'Đỉnh 20 nến'], [LL20[i], 'Đáy 20 nến'], [HH55[i], 'Đỉnh 55 nến'], [LL55[i], 'Đáy 55 nến'],
+    [TOP[i], 'Mây Ichimoku (trên)'], [BOT[i], 'Mây Ichimoku (dưới)'],
+    [rsiPx(D, 30), 'RSI = 30 (quá bán)'], [rsiPx(D, 70), 'RSI = 70 (quá mua)'],
+    up ? [rsiPx(D, 40), 'RSI chỉnh về 40'] : [rsiPx(D, 60), 'RSI hồi lên 60'],
+  ].filter(([x]) => x != null && isFinite(x) && Math.abs(x - p) < 8 * a).sort((x, y) => x[0] - y[0]);
+  // gộp các mức gần nhau (< 0.4 ATR) thành 1 vùng
+  const zones = [];
+  for (const [x, nm] of raw) {
+    const z = zones.at(-1);
+    if (z && x - z.hi < 0.4 * a) { z.hi = x; z.names.push(nm); } else zones.push({lo: x, hi: x, names: [nm]});
+  }
+  const res = zones.filter(z => z.lo > p).slice(0, 3);
+  const sup = zones.filter(z => z.hi < p).reverse().slice(0, 3);
+  const at = zones.find(z => z.lo <= p && z.hi >= p);
+  return {res, sup, at, p, a};
+}
+
+const zt = z => z.hi - z.lo < 1 ? num(z.lo) : `${num(z.lo)} – ${num(z.hi)}`;
+const mid = z => (z.lo + z.hi) / 2;
+
+function plan(D) {
+  const t = D.t, tn = TFN[t], tr = trendOf(D), Lz = levels(D), {res, sup, p, a} = Lz, i = D.N - 1;
+  const out = [];
+  const mk = (d, kind, z, cond, ref, tps) => {
+    // Cắt lỗ cách vùng 1 ATR; nếu ngay sau đó còn 1 vùng khác sát bên thì đặt dưới/trên luôn vùng đó (tránh bị quét)
+    const list = d > 0 ? sup : res, e = mid(z);
+    let edge = d > 0 ? z.lo : z.hi, k = list.indexOf(z) + 1;
+    while (list[k] && (d > 0 ? edge - list[k].hi : list[k].lo - edge) < a) { edge = d > 0 ? list[k].lo : list[k].hi; k++; }
+    let sl = edge - d * (edge === (d > 0 ? z.lo : z.hi) ? a : 0.3 * a);
+    if (Math.abs(e - sl) > 2.5 * a) sl = d > 0 ? z.lo - a : z.hi + a; // cắt lỗ quá xa thì quay về mặc định
+    const risk = Math.abs(e - sl);
+    const t1 = tps[0] != null ? tps[0] : e + d * 2 * risk, t2 = tps[1] != null ? tps[1] : e + d * 3 * risk;
+    const r = ruleOf(D, ref);
+    out.push({d, kind, z, cond, e, sl, t1, t2, rr1: Math.abs(t1 - e) / risk, r});
+  };
+  if (!tr.up) {
+    if (res[0]) mk(-1, 'main', res[0],
+      `Chờ giá <b>hồi lên ${zt(res[0])}</b> (${res[0].names.join(' + ')}). Khi đó RSI ${tn} khoảng <b>${rsiAt(D, mid(res[0])).toFixed(0)}</b>. Vào lệnh khi nến ${tn} tại vùng này có râu trên dài hoặc đóng nến giảm.`,
+      'Downtrend + RSI lên trên 65 (bán khi hồi)', [sup[0] && sup[0].hi, sup[1] && sup[1].hi]);
+    const z = sup.find(s => rsiAt(D, s.hi) <= 38) || sup[1] || sup[0];
+    if (z) mk(1, 'counter', z,
+      `Chờ giá <b>giảm về ${zt(z)}</b> (${z.names.join(' + ')}). Khi đó RSI ${tn} khoảng <b>${rsiAt(D, mid(z)).toFixed(0)}</b>. Chỉ LONG nếu có <b>phân kỳ tăng</b> (giá đáy thấp hơn nhưng RSI đáy cao hơn) hoặc nến rút chân mạnh.`,
+      'Phân kỳ tăng, RSI gần 30', [res[0] && res[0].lo, res[1] && res[1].lo]);
+  } else {
+    if (sup[0]) mk(1, 'main', sup[0],
+      `Chờ giá <b>điều chỉnh về ${zt(sup[0])}</b> (${sup[0].names.join(' + ')}). Khi đó RSI ${tn} khoảng <b>${rsiAt(D, mid(sup[0])).toFixed(0)}</b>. Vào lệnh khi nến ${tn} tại vùng này rút chân hoặc đóng nến tăng.`,
+      'Uptrend + RSI xuống dưới 35 (mua khi điều chỉnh)', [res[0] && res[0].lo, res[1] && res[1].lo]);
+    const z = res.find(s => rsiAt(D, s.lo) >= 62) || res[1] || res[0];
+    if (z) mk(-1, 'counter', z,
+      `Chờ giá <b>tăng lên ${zt(z)}</b> (${z.names.join(' + ')}). Khi đó RSI ${tn} khoảng <b>${rsiAt(D, mid(z)).toFixed(0)}</b>. Chỉ SHORT nếu có <b>phân kỳ giảm</b> (giá đỉnh cao hơn nhưng RSI đỉnh thấp hơn) hoặc nến râu trên dài.`,
+      'Phân kỳ giảm, RSI gần 70', [sup[0] && sup[0].hi, sup[1] && sup[1].hi]);
+  }
+  // Trạng thái phân kỳ so với đáy/đỉnh RSI gần nhất đã xác nhận
+  const {plo, phi, L, H, R, E200} = D, lo = plo.at(-1), hi = phi.at(-1);
+  const recentLow = minA(L.slice(i - 4, i + 1)), recentHigh = maxA(H.slice(i - 4, i + 1));
+  const div = [];
+  if (lo != null) div.push(recentLow < L[lo] && R[i] > R[lo]
+    ? `<span class="up"><b>Đang có dấu hiệu phân kỳ tăng</b></span>: giá thấp hơn đáy ${num(L[lo])} nhưng RSI (${R[i].toFixed(0)}) cao hơn RSI đáy cũ (${R[lo].toFixed(0)}). Chưa xác nhận — chờ RSI quay đầu đi lên.`
+    : `Phân kỳ tăng sẽ xuất hiện nếu giá <b>xuống dưới ${num(L[lo])}</b> (đáy ${vn(D.T[lo], {day: '2-digit', month: '2-digit'})}) mà RSI vẫn <b>trên ${R[lo].toFixed(0)}</b>.`);
+  if (hi != null) div.push(recentHigh > H[hi] && R[i] < R[hi]
+    ? `<span class="down"><b>Đang có dấu hiệu phân kỳ giảm</b></span>: giá cao hơn đỉnh ${num(H[hi])} nhưng RSI (${R[i].toFixed(0)}) thấp hơn RSI đỉnh cũ (${R[hi].toFixed(0)}). Chưa xác nhận — chờ RSI quay đầu đi xuống.`
+    : `Phân kỳ giảm sẽ xuất hiện nếu giá <b>vượt ${num(H[hi])}</b> (đỉnh ${vn(D.T[hi], {day: '2-digit', month: '2-digit'})}) mà RSI vẫn <b>dưới ${R[hi].toFixed(0)}</b>.`);
+  const inval = tr.up
+    ? `Nếu nến ${tn} <b>đóng dưới ${num(E200[i])}</b> (EMA200) → xu hướng chuyển giảm, bỏ kịch bản LONG.`
+    : `Nếu nến ${tn} <b>đóng trên ${num(E200[i])}</b> (EMA200) → xu hướng chuyển tăng, bỏ kịch bản SHORT.`;
+  return {tr, Lz, sc: out, div, inval};
+}
+
+function probTxt(r) {
+  if (!r || !r.st.tp) return '';
+  const w = Math.round(r.st.tp.win / 10), R = r.st.tp.R;
+  return `📊 Lịch sử khung này: tín hiệu kiểu này <b>10 lần thì khoảng ${w} lần chạm chốt lời</b> (lời:lỗ 1:${rr}), tổng thể
+    <b class="${R > 0.02 ? 'up' : R < -0.02 ? 'down' : ''}">${R > 0.02 ? 'có lãi' : R < -0.02 ? 'bị lỗ' : 'hòa vốn'}</b> (${sg(R.toFixed(2))}R, ${r.st.tp.n} lệnh).` +
+    (r.st.tp.n < MINN ? ' <b class="acc">Ít mẫu, chưa đáng tin.</b>' : '');
+}
+
+function renderCard(t) {
+  const D = store[t].D; if (!D) return;
+  const P = plan(D), {tr, Lz, sc, div, inval} = P, {C, N, E200, DIR, R} = D, i = N - 1, tn = TFN[t];
+  const rz = R[i] < 30 ? 'Quá bán — giá đã giảm nhiều' : R[i] < 40 ? 'Gần quá bán' : R[i] > 70 ? 'Quá mua — giá đã tăng nhiều' : R[i] > 60 ? 'Gần quá mua' : 'Trung tính';
+  const why = `Giá ${num(Lz.p)} đang <b>${tr.up ? 'trên' : 'dưới'} EMA200</b> (${num(E200[i])}, cách ${pct(Lz.p, E200[i])}), Supertrend <b class="${DIR[i] === 1 ? 'up' : 'down'}">${DIR[i] === 1 ? 'xanh' : 'đỏ'}</b>
+    → phe <b>${tr.up ? 'mua' : 'bán'}</b> đang chiếm ưu thế ở khung ${tn}.`;
+  const row = (z, cls) => `<div class="lv ${cls}"><b class="${cls === 'res' ? 'down' : 'up'}">${zt(z)}</b><span>${z.names.join(' + ')}</span>
+    <span class="mut">${pct(mid(z), Lz.p)}${z.names.length > 1 ? ' · <b class="acc">vùng mạnh</b>' : ''}</span></div>`;
+  const ladder = [...Lz.res].reverse().map(z => row(z, 'res')).join('') +
+    `<div class="lv now"><b>${num(Lz.p)}</b><span>◀ Giá hiện tại${Lz.at ? ' (đang nằm trong vùng ' + Lz.at.names.join(' + ') + ')' : ''}</span><span></span></div>` +
+    Lz.sup.map(z => row(z, 'sup')).join('');
+  const scHtml = sc.map(s => `<div class="sc ${s.d > 0 ? 'long' : 'short'}">
+      <div class="tfh">${tag(s.d)}<b>${s.kind === 'main' ? 'Kịch bản chính · thuận xu hướng' : 'Kịch bản phụ · ngược xu hướng'}</b>
+        ${s.kind === 'counter' ? '<span class="b acc">Rủi ro cao · vào lệnh nhỏ</span>' : ''}</div>
+      <p>${s.cond}</p>
+      <div class="g4"><div><span>Vùng vào lệnh</span><b>${zt(s.z)}</b></div><div><span>Cắt lỗ</span><b class="down">${num(s.sl)}</b></div>
+        <div><span>Chốt lời 1</span><b class="up">${num(s.t1)}</b></div><div><span>Chốt lời 2</span><b class="up">${num(s.t2)}</b></div></div>
+      <div class="prob">Lời:lỗ tới chốt lời 1 ≈ 1:${s.rr1.toFixed(1)}${s.rr1 < 1 ? ' <b class="down">(lời ít hơn lỗ — cân nhắc bỏ qua)</b>' : ''}</div>
+      <div class="prob">${probTxt(s.r)}</div>
+    </div>`).join('') || '<p class="mut">Chưa xác định được vùng giá phù hợp.</p>';
+  $('card' + t).innerHTML = `
+    <div class="tfh"><h3>Khung ${t === '1d' ? 'NGÀY (D)' : '4 GIỜ (4H)'}</h3><span class="b ${tr.cls}">XU HƯỚNG ${tr.label}</span></div>
+    <p class="why">${why}</p>
+    <div class="rsi"><b>RSI ${tn}: ${R[i].toFixed(1)}</b> <span class="mut">· ${rz}${t === '4h' ? ' · nến đang chạy ' + R[N].toFixed(0) : ''}</span>
+      <div class="rsibar"><i style="left:${Math.min(100, Math.max(0, R[i]))}%"></i></div>
+      <div class="rsiscale"><span>0 · vùng canh mua</span><span>30</span><span>50</span><span>70</span><span>vùng canh bán · 100</span></div></div>
+    <h4>Các mức giá quan trọng (dự báo vùng đảo chiều)</h4>
+    <div class="ladder">${ladder}</div>
+    <h4>Phân kỳ RSI</h4>
+    <p style="margin:0">${div.join('<br>')}</p>
+    <h4>Kịch bản giao dịch</h4>
+    ${scHtml}
+    <div class="warn">⚠️ ${inval}</div>`;
+  return P;
+}
+
+function renderHero(P1, P4) {
+  if (!P1 || !P4) return;
+  const u1 = P1.tr.up, u4 = P4.tr.up, p = store['4h'].D.C[store['4h'].D.N];
+  let head, body;
+  if (!u1 && !u4) { head = '<span class="down">Cả khung D và 4H đều GIẢM → ưu tiên SHORT khi giá hồi lên</span>';
+    body = 'Không đuổi theo bán ở giá thấp. Chờ giá hồi lên vùng kháng cự rồi mới SHORT. LONG chỉ khi giá về vùng hỗ trợ mạnh <b>và</b> có phân kỳ tăng RSI, vào lệnh nhỏ, chốt lời nhanh.'; }
+  else if (u1 && u4) { head = '<span class="up">Cả khung D và 4H đều TĂNG → ưu tiên LONG khi giá điều chỉnh</span>';
+    body = 'Không đuổi mua ở giá cao. Chờ giá điều chỉnh về vùng hỗ trợ rồi mới LONG. SHORT chỉ khi giá lên kháng cự mạnh <b>và</b> có phân kỳ giảm RSI, vào lệnh nhỏ.'; }
+  else if (u1 && !u4) { head = '<span class="acc">Khung D TĂNG nhưng 4H đang GIẢM → giá đang điều chỉnh trong xu hướng tăng</span>';
+    body = 'Xu hướng lớn vẫn tăng. Chờ khung 4H về vùng hỗ trợ và RSI 4H xuống gần 30 để tìm điểm LONG theo khung D. Hạn chế SHORT.'; }
+  else { head = '<span class="acc">Khung D GIẢM nhưng 4H đang TĂNG → giá đang hồi trong xu hướng giảm</span>';
+    body = 'Xu hướng lớn vẫn giảm. Chờ khung 4H lên vùng kháng cự và RSI 4H lên 65–70 để tìm điểm SHORT theo khung D. Hạn chế LONG.'; }
+  const r4 = P4.Lz.res[0], s4 = P4.Lz.sup[0];
+  const near = `Giá hiện tại <b>${num(p)}</b>.` +
+    (r4 ? ` Kháng cự gần nhất (4H): <b class="down">${zt(r4)}</b> (cách ${pct(mid(r4), p)}).` : '') +
+    (s4 ? ` Hỗ trợ gần nhất (4H): <b class="up">${zt(s4)}</b> (cách ${pct(mid(s4), p)}).` : '');
+  $('hero').innerHTML = `<h2>Nhận định nhanh</h2><div class="big">${head}</div><p>${body}</p><p>${near}</p>`;
+}
+
+// ================= Chi tiết (khung đang chọn) =================
+function renderTech(D) {
+  const {C, V, N, R, E50, E200, M, S, HI, BU, BL, VM, A, K, DK, ST, DIR, PDI, MDI, ADX, TOP, BOT, HH20, LL20, MFI} = D, i = N - 1;
+  const pb = (C[i] - BL[i]) / (BU[i] - BL[i]);
+  const rows = [
+    ['EMA 50 / 200', `${num(E50[i])} / ${num(E200[i])}`, E50[i] > E200[i] ? 1 : -1],
+    ['Giá so với EMA200', pct(C[i], E200[i]), C[i] > E200[i] ? 1 : -1],
+    ['Supertrend (10,3)', num(ST[i]), DIR[i]],
+    ['Ichimoku', C[i] > TOP[i] ? 'Trên mây' : C[i] < BOT[i] ? 'Dưới mây' : 'Trong mây', C[i] > TOP[i] ? 1 : C[i] < BOT[i] ? -1 : 0],
+    ['ADX / DMI (14)', `${ADX[i].toFixed(0)} · ${ADX[i] > 25 ? 'trend mạnh' : 'đi ngang'}`, ADX[i] > 25 ? (PDI[i] > MDI[i] ? 1 : -1) : 0],
+    ['MACD (12,26,9)', sg(HI[i].toFixed(0)), M[i] > S[i] ? 1 : -1],
+    ['RSI (14)', R[i].toFixed(1), R[i] > 55 ? 1 : R[i] < 45 ? -1 : 0],
+    ['Stoch RSI', `${K[i].toFixed(0)} / ${DK[i].toFixed(0)}`, K[i] > DK[i] ? 1 : -1],
+    ['MFI (14)', MFI[i].toFixed(1), MFI[i] > 55 ? 1 : MFI[i] < 45 ? -1 : 0],
+    ['Bollinger %B', (pb * 100).toFixed(0) + '%', pb > 1 ? 1 : pb < 0 ? -1 : 0],
+    ['Donchian 20', C[i] >= HH20[i - 1] ? 'Phá đỉnh' : C[i] <= LL20[i - 1] ? 'Thủng đáy' : 'Trong kênh', C[i] >= HH20[i - 1] ? 1 : C[i] <= LL20[i - 1] ? -1 : 0],
+    ['Volume', (V[i] / VM[i]).toFixed(1) + '× TB 20', null],
+    ['ATR (14)', `${num(A[i])} (${(A[i] / C[i] * 100).toFixed(1)}%)`, null],
+  ];
+  const vs = rows.filter(r => r[2] != null).map(r => r[2]);
+  const b = vs.filter(x => x > 0).length, s = vs.filter(x => x < 0).length, n = vs.length - b - s, sc = (b - s) / vs.length;
+  const [lab, cls] = sc > 0.5 ? ['MUA MẠNH', 'up'] : sc > 0.15 ? ['MUA', 'up'] : sc < -0.5 ? ['BÁN MẠNH', 'down'] : sc < -0.15 ? ['BÁN', 'down'] : ['TRUNG LẬP', 'mut'];
+  $('gauge').innerHTML = `<div style="font-size:20px;font-weight:700" class="${cls}">${lab} <span class="mut" style="font-size:13px;font-weight:400">· Bán ${s} · Trung lập ${n} · Mua ${b}</span></div>`;
+  const badge = v => v == null ? '<span class="mut">—</span>' : v > 0 ? '<span class="b up">Mua</span>' : v < 0 ? '<span class="b down">Bán</span>' : '<span class="b neu">Trung lập</span>';
+  $('tech').innerHTML = rows.map(([a, v, x]) => `<tr><td>${a}</td><td class="mut">${v}</td><td>${badge(x)}</td></tr>`).join('');
+}
+
+function renderRecent(D) {
+  const {rules, N, T, C} = D;
+  const list = rules.flatMap(r => r.idx.filter(e => e >= N - 20).map(e => [e, r])).sort((a, b) => b[0] - a[0]);
+  $('recent').innerHTML = `<tr><th>Thời gian</th><th>Hướng</th><th style="text-align:left">Tín hiệu</th><th>Giá</th><th>Chạm TP</th><th>Kỳ vọng</th></tr>` +
+    (list.length ? list.map(([e, r]) => `<tr><td>${vn(T[e])}</td><td>${tag(r.d)}</td><td class="nm" style="text-align:left">${r.name}</td><td>${num(C[e])}</td>
+      <td>${r.st.tp ? r.st.tp.win.toFixed(0) + '%' : '–'}</td><td class="${r.st.tp ? rcls(r.st.tp.R) : ''}">${r.st.tp ? sg(r.st.tp.R.toFixed(2)) + 'R' : '–'}</td></tr>`).join('')
+    : '<tr><td colspan="6" class="mut">Không có tín hiệu nào.</td></tr>');
+}
+
+function renderTable(D) {
+  const {rules, base} = D, [, hl] = HOR[D.t];
+  const cell = (st, d) => {
+    const diff = st.dir == null ? 0 : st.dir - base[d].dir, tp = st.tp, rec = st.rec;
+    return `<td>${st.n}${st.n < MINN ? ' <span class="mut" style="font-size:12px">ít mẫu</span>' : ''}</td>
+      <td class="${diff >= 3 ? 'up' : diff <= -3 ? 'down' : ''}">${st.dir == null ? '–' : st.dir.toFixed(0) + '%'}</td>
+      <td>${tp ? tp.win.toFixed(0) + '%' : '–'}</td>
+      <td class="${tp ? rcls(tp.R) : ''}" style="font-weight:600">${tp ? sg(tp.R.toFixed(2)) + 'R' : '–'}</td>
+      <td class="${rec ? rcls(rec.R) : ''}">${rec ? sg(rec.R.toFixed(2)) + 'R' : '–'}</td>
+      <td>${st.ok ? '<span class="acc">✓</span>' : '<span class="mut">—</span>'}</td>`;
+  };
+  let html = `<tr><th>Tín hiệu</th><th>Hướng</th><th>Số lệnh</th><th>Đúng hướng sau ${hl}</th><th>Chạm TP</th><th>Kỳ vọng R</th><th>R 2 năm gần</th><th>Đạt chuẩn</th></tr>
+    <tr class="grp"><td colspan="8">So sánh: vào lệnh bừa</td></tr>
+    <tr><td class="nm mut">Vào bừa</td><td>${tag(1)}</td>${cell(base[1], 1)}</tr>
+    <tr><td class="nm mut">Vào bừa</td><td>${tag(-1)}</td>${cell(base[-1], -1)}</tr>`;
+  const order = rules.map((r, k) => [r, k]);
+  if (sortBy === 'R') order.sort((a, b) => (b[0].st.tp ? b[0].st.tp.R : -9) - (a[0].st.tp ? a[0].st.tp.R : -9));
+  let g = null;
+  for (const [r, k] of order) {
+    const grp = sortBy === 'R' ? 'Hiệu quả cao → thấp' : r.g;
+    if (grp !== g) { g = grp; html += `<tr class="grp"><td colspan="8">${g}</td></tr>`; }
+    html += `<tr class="rule${sel === k ? ' sel' : ''}" data-k="${k}"><td class="nm">${r.name}</td><td>${tag(r.d)}</td>${cell(r.st, r.d)}</tr>`;
+  }
+  $('stats').innerHTML = html;
+  document.querySelectorAll('tr.rule').forEach(tr => tr.onclick = () => {
+    const k = +tr.dataset.k; sel = sel === k ? null : k;
+    document.querySelectorAll('tr.rule').forEach(x => x.classList.toggle('sel', +x.dataset.k === sel));
+    markers(); if (sel != null) $('cMain').scrollIntoView({behavior: 'smooth', block: 'center'});
+  });
+}
+
+// ================= Biểu đồ =================
+const COL = {up: '#03A66D', down: '#CF304A', acc: '#F0B90B', blue: '#2563EB', purple: '#8B5CF6', grid: '#EAECEF', txt: '#707A8A', bg: '#FFFFFF'};
+function initCharts() {
+  if (!window.LightweightCharts) { $('cMain').innerHTML = '<p class="mut" style="padding:16px">Không tải được thư viện biểu đồ (cần mạng).</p>'; return; }
+  const LC = LightweightCharts;
+  const opt = showTime => ({
+    autoSize: true,
+    layout: {background: {color: COL.bg}, textColor: COL.txt, fontFamily: "'IBM Plex Sans', system-ui, sans-serif"},
+    grid: {vertLines: {color: '#F3F4F6'}, horzLines: {color: '#F3F4F6'}},
+    crosshair: {mode: LC.CrosshairMode.Normal},
+    rightPriceScale: {borderColor: COL.grid, minimumWidth: 84},
+    timeScale: {visible: showTime, timeVisible: true, borderColor: COL.grid},
+  });
+  const main = LC.createChart($('cMain'), opt(false)), oc = LC.createChart($('cOsc'), opt(true));
+  const line = (ch, color, w = 1, extra = {}) => ch.addLineSeries({color, lineWidth: w, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false, ...extra});
+  const s = {
+    vol: main.addHistogramSeries({priceScaleId: 'vol', priceFormat: {type: 'volume'}, priceLineVisible: false, lastValueVisible: false}),
+    candle: main.addCandlestickSeries({upColor: COL.up, downColor: COL.down, wickUpColor: COL.up, wickDownColor: COL.down, borderVisible: false}),
+    e50: line(main, COL.acc, 1.5), e200: line(main, COL.purple, 2),
+    bu: line(main, '#B7BDC6'), bl: line(main, '#B7BDC6'),
+    st: line(main, COL.up, 2), sa: line(main, 'rgba(3,166,109,.5)'), sb: line(main, 'rgba(207,48,74,.5)'),
+    o1: line(oc, COL.purple, 2, {lastValueVisible: true}), o2: line(oc, COL.acc), o3: line(oc, COL.down),
+    oh: oc.addHistogramSeries({priceLineVisible: false, lastValueVisible: false}),
+  };
+  main.priceScale('vol').applyOptions({scaleMargins: {top: 0.85, bottom: 0}});
+  let busy = false;
+  [main, oc].forEach((ch, k, all) => ch.timeScale().subscribeVisibleLogicalRangeChange(r => {
+    if (busy || !r) return; busy = true; all[1 - k].timeScale().setVisibleLogicalRange(r); busy = false;
+  }));
+  charts = {main, oc, s, pl: [], lvl: []};
+}
+
+function drawCharts() {
+  const D = store[chartTf].D;
+  if (!charts || !D) return;
+  const {T, O, H, L, C, V, E50, E200, BU, BL, ST, DIR, SA, SB} = D, {s, main} = charts;
+  const from = Math.max(0, C.length - CH), t = i => T[i] / 1000 + VN, idx = [];
+  for (let i = from; i < C.length; i++) idx.push(i);
+  const pts = a => idx.map(i => a[i] == null ? {time: t(i)} : {time: t(i), value: a[i]});
+  Object.assign(charts, {idx, t, pts});
+  s.candle.setData(idx.map(i => ({time: t(i), open: O[i], high: H[i], low: L[i], close: C[i]})));
+  s.vol.setData(idx.map(i => ({time: t(i), value: V[i], color: C[i] >= O[i] ? 'rgba(3,166,109,.3)' : 'rgba(207,48,74,.3)'})));
+  s.e50.setData(pts(E50)); s.e200.setData(pts(E200)); s.bu.setData(pts(BU)); s.bl.setData(pts(BL));
+  s.st.setData(idx.map(i => ({time: t(i), value: ST[i], color: DIR[i] === 1 ? COL.up : COL.down})));
+  s.sa.setData(pts(SA)); s.sb.setData(pts(SB));
+  applyOverlays(); setOsc(); markers();
+  if (fit) { fit = false; main.timeScale().setVisibleLogicalRange({from: idx.length - 160, to: idx.length + 5}); }
+}
+
+function drawLevels() {
+  if (!charts) return;
+  const {s} = charts;
+  charts.lvl.forEach(p => s.candle.removePriceLine(p)); charts.lvl = [];
+  const D = store[chartTf].D;
+  if (!ov.lv || !D) return;
+  const {res, sup} = levels(D);
+  const mk = (z, color) => charts.lvl.push(s.candle.createPriceLine({price: mid(z), color, lineWidth: 1, lineStyle: 2, axisLabelVisible: true,
+    title: z.names.length > 1 ? `${z.names[0]} +${z.names.length - 1}` : z.names[0]}));
+  res.forEach(z => mk(z, COL.down)); sup.forEach(z => mk(z, COL.up));
+}
+
+function applyOverlays() {
+  if (!charts) return;
+  const {s} = charts, vis = (arr, v) => arr.forEach(x => x.applyOptions({visible: v}));
+  vis([s.e50, s.e200], ov.ema); vis([s.st], ov.st); vis([s.bu, s.bl], ov.bb); vis([s.sa, s.sb], ov.ichi);
+  document.querySelectorAll('[data-ov]').forEach(b => b.classList.toggle('on', ov[b.dataset.ov]));
+  drawLevels();
+}
+
+function setOsc() {
+  document.querySelectorAll('[data-osc]').forEach(b => b.classList.toggle('on', b.dataset.osc === osc));
+  const D = store[chartTf].D;
+  if (!charts || !D || !charts.idx) return;
+  const {s, idx, t, pts} = charts, {R, K, DK, M, S, HI, ADX, PDI, MDI, MFI} = D;
+  const c = {
+    'RSI': {l: [[R, COL.purple]], lv: [30, 70]},
+    'Stoch RSI': {l: [[K, COL.blue], [DK, COL.acc]], lv: [20, 80]},
+    'MACD': {l: [[M, COL.blue], [S, COL.acc]], h: HI, lv: [0]},
+    'ADX': {l: [[ADX, COL.acc], [PDI, COL.up], [MDI, COL.down]], lv: [25]},
+    'MFI': {l: [[MFI, COL.purple]], lv: [20, 80]},
+  }[osc];
+  [s.o1, s.o2, s.o3].forEach((ser, k) => { const x = c.l[k]; ser.setData(x ? pts(x[0]) : []); if (x) ser.applyOptions({color: x[1]}); });
+  s.oh.setData(c.h ? idx.map(i => ({time: t(i), value: c.h[i], color: c.h[i] >= 0 ? 'rgba(3,166,109,.5)' : 'rgba(207,48,74,.5)'})) : []);
+  charts.pl.forEach(p => s.o1.removePriceLine(p));
+  charts.pl = c.lv.map(v => s.o1.createPriceLine({price: v, color: '#B7BDC6', lineStyle: 2, lineWidth: 1, axisLabelVisible: false}));
+}
+
+function markers() {
+  const D = store[chartTf].D;
+  if (!charts || !D) return;
+  if (sel == null) { charts.s.candle.setMarkers([]); $('markInfo').textContent = ''; return; }
+  const r = D.rules[sel], from = Math.max(0, D.C.length - CH);
+  charts.s.candle.setMarkers(r.idx.filter(e => e >= from).map(e => ({
+    time: D.T[e] / 1000 + VN, position: r.d > 0 ? 'belowBar' : 'aboveBar',
+    color: r.d > 0 ? COL.up : COL.down, shape: r.d > 0 ? 'arrowUp' : 'arrowDown',
+  })));
+  $('markInfo').innerHTML = `Đang hiện: <b style="color:var(--fg)">${r.name}</b>`;
+}
+
+// ================= Điều khiển =================
+function renderAll() {
+  const P1 = renderCard('1d'), P4 = renderCard('4h');
+  renderHero(P1, P4);
+  renderChartTf();
+  const D4 = store['4h'].D;
+  $('status').textContent = `Cập nhật ${vn(Date.now(), {hour: '2-digit', minute: '2-digit', second: '2-digit'})} (giờ VN) · tự làm mới mỗi phút · nến 4H hiện tại đóng lúc ${vn(D4.T[D4.N] + MS['4h'], {hour: '2-digit', minute: '2-digit'})} · nến D đóng lúc 07:00`;
+}
+function renderChartTf() {
+  const D = store[chartTf].D; if (!D) return;
+  document.querySelectorAll('[data-tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === chartTf));
+  renderTech(D); renderRecent(D); renderTable(D); drawCharts();
+}
+async function boot() {
+  try {
+    ticker();
+    await Promise.all([loadTF('1d', true), loadTF('4h', true)]);
+    renderAll();
+    setInterval(refresh, 60000);
+  } catch (e) { $('status').textContent = 'Không tải được dữ liệu từ Binance (' + e.message + '). Kiểm tra mạng rồi tải lại trang.'; }
+}
+async function refresh() {
+  try {
+    await Promise.all(['1d', '4h', ...(store['1h'].D ? ['1h'] : [])].map(t => loadTF(t, false)));
+    renderAll(); ticker();
+  } catch (e) { $('status').textContent = 'Mất kết nối, sẽ thử lại sau 1 phút…'; }
+}
+async function pickChart(t) {
+  chartTf = t; sel = null; fit = true;
+  document.querySelectorAll('[data-tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === t));
+  if (!store[t].D) { $('status').textContent = 'Đang tải dữ liệu khung ' + TFN[t] + '…'; await loadTF(t, true); }
+  if (chartTf === t) renderChartTf();
+}
+const onBar = (attr, fn) => document.querySelectorAll(`[${attr}]`).forEach(b => b.onclick = () => fn(b.getAttribute(attr)));
+onBar('data-tf', pickChart);
+onBar('data-ov', k => { ov[k] = !ov[k]; applyOverlays(); });
+onBar('data-osc', k => { osc = k; setOsc(); });
+onBar('data-rr', k => { rr = +k; markRR(); for (const t in store) if (store[t].D) store[t].D = compute(t); if (store['4h'].D) renderAll(); });
+onBar('data-sort', k => { sortBy = k; markSort(); if (store[chartTf].D) renderTable(store[chartTf].D); });
+const markRR = () => document.querySelectorAll('[data-rr]').forEach(b => b.classList.toggle('on', +b.dataset.rr === rr));
+const markSort = () => document.querySelectorAll('[data-sort]').forEach(b => b.classList.toggle('on', b.dataset.sort === sortBy));
+markRR(); markSort(); setOsc();
+document.querySelectorAll('[data-tf]').forEach(b => b.classList.toggle('on', b.dataset.tf === chartTf));
+initCharts(); applyOverlays();
+boot();
+</script>
+</body>
+</html>
